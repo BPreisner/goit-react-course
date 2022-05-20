@@ -5,7 +5,7 @@ export const ProductWrapper = styled.div`
   flex-direction: column;
   padding: 20px;
   border: 1px solid grey;
-  margin: 0 20px;
+  margin: 20px;
 `;
 
 export const ProductImage = styled.img`
@@ -25,7 +25,7 @@ export const Button = styled.button`
   align-items: center;
   justify-content: center;
   gap: 10px;
-  margin-top: 50px;
+  margin-top: 35px;
   cursor: pointer;
 
   &:not(:disabled) {
@@ -48,6 +48,7 @@ export const Button = styled.button`
 const commonStylesForText = css`
   font-weight: bold;
   color: grey;
+  margin: 5px;
 `;
 
 export const Text = styled.p`

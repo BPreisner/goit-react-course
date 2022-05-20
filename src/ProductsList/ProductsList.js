@@ -8,7 +8,7 @@ class ProductsListAsClass extends Component {
 
     this.state = {
       cartItems: [],
-      counter: 1,
+      isCartDialogOpen: false,
     };
   }
 
@@ -18,50 +18,88 @@ class ProductsListAsClass extends Component {
     }));
   };
 
+  // handleToggleCardDialog = () => {
+  //   this.setState((prevState) => ({
+  //     isCartDialogOpen: !prevState.isCartDialogOpen,
+  //   }));
+  // };
+
+  handleOpenCartDialog = () => {
+    this.setState(
+      {
+        isCartDialogOpen: true,
+      },
+      () => {
+        console.log(this.state.isCartDialogOpen);
+      },
+    );
+
+    console.log(this.state.isCartDialogOpen);
+  };
+
+  handleCloseCartDialog = () => {
+    this.setState({
+      isCartDialogOpen: false,
+    });
+  };
+
   render() {
     const { children, products } = this.props;
 
     console.log(this.state);
 
     return (
-      <StyledProductsList>
-        {products.map((product) => {
-          const { id, name, price, quantity, imgUrl } = product;
+      <>
+        <button onClick={this.handleOpenCartDialog}>Open basket</button>
+        <dialog open={this.state.isCartDialogOpen}>
+          <button onClick={this.handleCloseCartDialog}>Close</button>
 
-          return (
-            <Product
-              key={id}
-              name={name}
-              price={price}
-              quantity={quantity}
-              imgUrl={imgUrl}
-              onProductClick={this.handleClick}
-            />
-          );
-        })}
-        {children}
-      </StyledProductsList>
+          <ul>
+            {this.state.cartItems.length > 0
+              ? this.state.cartItems.map((item) => <li>{item}</li>)
+              : 'Empty Cart'}
+          </ul>
+        </dialog>
+
+        <StyledProductsList>
+          {products.map((product) => {
+            const { id, name, price, quantity, imgUrl } = product;
+
+            return (
+              <Product
+                key={id}
+                name={name}
+                price={price}
+                quantity={quantity}
+                imgUrl={imgUrl}
+                onProductClick={this.handleClick}
+              />
+            );
+          })}
+          {children}
+        </StyledProductsList>
+      </>
     );
   }
 }
 
-const ProductsList = ({ products, children }) => (
-  <StyledProductsList>
-    {products.map((product) => {
-      const { id, name, price, quantity, imgUrl } = product;
+// const ProductsList = ({ products, children }) => (
+//   <StyledProductsList>
+//     {products.map((product) => {
+//       const { id, name, price, quantity, imgUrl } = product;
 
-      return (
-        <Product
-          key={id}
-          name={name}
-          price={price}
-          quantity={quantity}
-          imgUrl={imgUrl}
-        />
-      );
-    })}
-    {children}
-  </StyledProductsList>
-);
+//       return (
+//         <Product
+//           key={id}
+//           name={name}
+//           price={price}
+//           quantity={quantity}
+//           imgUrl={imgUrl}
+//         />
+//       );
+//     })}
+//     {children}
+//   </StyledProductsList>
+// );
 
 export default ProductsListAsClass;
