@@ -1,8 +1,9 @@
 import { Component } from 'react';
 import Product from '../Product/Product';
 import { StyledProductsList } from './ProductsList.styles';
+import Cart from '../Cart/Cart';
 
-class ProductsListAsClass extends Component {
+class ProductsList extends Component {
   constructor() {
     super();
 
@@ -12,29 +13,16 @@ class ProductsListAsClass extends Component {
     };
   }
 
-  handleClick = (productName) => (event) => {
+  handleClick = (productInfo) => (event) => {
     this.setState((prevState) => ({
-      cartItems: [...prevState.cartItems, productName],
+      cartItems: [...prevState.cartItems, productInfo],
     }));
   };
 
-  // handleToggleCardDialog = () => {
-  //   this.setState((prevState) => ({
-  //     isCartDialogOpen: !prevState.isCartDialogOpen,
-  //   }));
-  // };
-
   handleOpenCartDialog = () => {
-    this.setState(
-      {
-        isCartDialogOpen: true,
-      },
-      () => {
-        console.log(this.state.isCartDialogOpen);
-      },
-    );
-
-    console.log(this.state.isCartDialogOpen);
+    this.setState({
+      isCartDialogOpen: true,
+    });
   };
 
   handleCloseCartDialog = () => {
@@ -46,20 +34,16 @@ class ProductsListAsClass extends Component {
   render() {
     const { children, products } = this.props;
 
-    console.log(this.state);
-
     return (
       <>
         <button onClick={this.handleOpenCartDialog}>Open basket</button>
-        <dialog open={this.state.isCartDialogOpen}>
-          <button onClick={this.handleCloseCartDialog}>Close</button>
 
-          <ul>
-            {this.state.cartItems.length > 0
-              ? this.state.cartItems.map((item) => <li>{item}</li>)
-              : 'Empty Cart'}
-          </ul>
-        </dialog>
+        {this.state.isCartDialogOpen && (
+          <Cart
+            cartItems={this.state.cartItems}
+            onCartClose={this.handleCloseCartDialog}
+          />
+        )}
 
         <StyledProductsList>
           {products.map((product) => {
@@ -72,7 +56,7 @@ class ProductsListAsClass extends Component {
                 price={price}
                 quantity={quantity}
                 imgUrl={imgUrl}
-                onProductClick={this.handleClick}
+                onProductClick={this.handleClick({ name, id, price })}
               />
             );
           })}
@@ -83,23 +67,4 @@ class ProductsListAsClass extends Component {
   }
 }
 
-// const ProductsList = ({ products, children }) => (
-//   <StyledProductsList>
-//     {products.map((product) => {
-//       const { id, name, price, quantity, imgUrl } = product;
-
-//       return (
-//         <Product
-//           key={id}
-//           name={name}
-//           price={price}
-//           quantity={quantity}
-//           imgUrl={imgUrl}
-//         />
-//       );
-//     })}
-//     {children}
-//   </StyledProductsList>
-// );
-
-export default ProductsListAsClass;
+export default ProductsList;

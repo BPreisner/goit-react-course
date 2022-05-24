@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import ProductsList from './ProductsList/ProductsList';
-import OrderForm from './OrderForm/OrderForm';
+// import OrderForm from './OrderForm/OrderForm';
 
 const products = [
   {
@@ -38,10 +38,8 @@ const products = [
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
-  <React.StrictMode>
-    <OrderForm />
-    <ProductsList products={products}>
-      <h1>Enjoy your meal!</h1>
-    </ProductsList>
-  </React.StrictMode>,
+  <>
+    {/* <OrderForm /> */}
+    <ProductsList products={products} />
+  </>,
 );
