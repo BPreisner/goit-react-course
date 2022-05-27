@@ -1,7 +1,7 @@
 import { FaShoppingCart, FaTrashAlt } from 'react-icons/fa';
 import { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Modal, Button } from 'rsuite';
+import { Modal, Button, Message } from 'rsuite';
 import {
   StyledIconButton,
   StyledCartItemsList,
@@ -41,12 +41,6 @@ class Cart extends Component {
     });
   };
 
-  handleCloseNotifiction = () => {
-    this.setState({
-      isNotificationVisible: false,
-    });
-  };
-
   componentDidMount() {
     this.timeout = setTimeout(() => {
       this.setState({ isNotificationVisible: true });
@@ -80,6 +74,12 @@ class Cart extends Component {
             <Modal.Title>Cart items</Modal.Title>
           </Modal.Header>
           <Modal.Body>
+            {this.state.isNotificationVisible && (
+              <Message type="success">
+                Congratulations! Here is your special promo code: 'fs#Rsf513'
+              </Message>
+            )}
+
             {isCartEmpty ? (
               <h4>Your cart is empty.</h4>
             ) : (
@@ -100,20 +100,6 @@ class Cart extends Component {
                 ))}
               </StyledCartItemsList>
             )}
-
-            <Modal open={this.state.isNotificationVisible} backdrop="static">
-              <Modal.Body>
-                Congratulations! Here is your promo code: 'fs#Rsf513'
-              </Modal.Body>
-              <Modal.Footer>
-                <Button
-                  onClick={this.handleCloseNotifiction}
-                  appearance="subtle"
-                >
-                  Close
-                </Button>
-              </Modal.Footer>
-            </Modal>
           </Modal.Body>
           <Modal.Footer>
             <Button onClick={this.handleCloseCartDialog} appearance="subtle">
