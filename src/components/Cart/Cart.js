@@ -1,5 +1,5 @@
+import { useState, useEffect } from 'react';
 import { FaShoppingCart, FaTrashAlt } from 'react-icons/fa';
-import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Modal, Button, Message } from 'rsuite';
 import {
@@ -8,108 +8,99 @@ import {
   StyledCartItem,
   Price,
 } from './Cart.styles';
+import { useToggle } from '../../hooks/useToggle';
 
-class Cart extends Component {
-  constructor() {
-    super();
+const Cart = ({ cartItems }) => {
+  const {
+    isOpen: isCartDialogOpen,
+    close: closeCartDialog,
+    open: openCartDialog,
+  } = useToggle();
+  const [isNotificationVisible, setIsNotificationVisible] = useState(false);
 
-    this.state = {
-      isCartDialogOpen: false,
-      isNotificationVisible: false,
-    };
-  }
+  const isCartEmpty = cartItems.length === 0;
+  let timeout = null;
 
-  static propTypes = {
-    cartItems: PropTypes.arrayOf(
-      PropTypes.exact({
-        title: PropTypes.string,
-        price: PropTypes.number,
-        id: PropTypes.number,
-      }),
-    ).isRequired,
-  };
-
-  handleOpenCartDialog = () => {
-    this.setState({
-      isCartDialogOpen: true,
-    });
-  };
-
-  handleCloseCartDialog = () => {
-    this.setState({
-      isCartDialogOpen: false,
-    });
-  };
-
-  componentDidMount() {
-    this.timeout = setTimeout(() => {
-      this.setState({ isNotificationVisible: true });
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    timeout = setTimeout(() => {
+      setIsNotificationVisible(true);
     }, 5000);
-  }
 
-  componentWillUnmount() {
-    clearTimeout(this.timeout);
-  }
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, []);
 
-  render() {
-    const { cartItems } = this.props;
-    const isCartEmpty = cartItems.length === 0;
+  const handleOpenCartDialog = () => {
+    openCartDialog();
+  };
 
-    return (
-      <>
-        <StyledIconButton
-          circle
-          icon={<FaShoppingCart />}
-          color="green"
-          appearance="primary"
-          size="lg"
-          onClick={this.handleOpenCartDialog}
-        />
+  const handleCloseCartDialog = () => {
+    closeCartDialog();
+  };
 
-        <Modal
-          open={this.state.isCartDialogOpen}
-          onClose={this.handleCloseCartDialog}
-        >
-          <Modal.Header>
-            <Modal.Title>Cart items</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            {this.state.isNotificationVisible && (
-              <Message type="success">
-                Congratulations! Here is your special promo code: 'fs#Rsf513'
-              </Message>
-            )}
+  return (
+    <>
+      <StyledIconButton
+        circle
+        icon={<FaShoppingCart />}
+        color="green"
+        appearance="primary"
+        size="lg"
+        onClick={handleOpenCartDialog}
+      />
 
-            {isCartEmpty ? (
-              <h4>Your cart is empty.</h4>
-            ) : (
-              <StyledCartItemsList bordered>
-                {cartItems.map((item, index) => (
-                  <StyledCartItem key={item.id + index} index={index}>
-                    {item.title}
-                    <Price>{item.price} $</Price>
-                    <StyledIconButton
-                      circle
-                      icon={<FaTrashAlt />}
-                      color="red"
-                      appearance="primary"
-                      size="md"
-                      onClick={this.handleOpenCartDialog}
-                    />
-                  </StyledCartItem>
-                ))}
-              </StyledCartItemsList>
-            )}
-          </Modal.Body>
-          <Modal.Footer>
-            <Button onClick={this.handleCloseCartDialog} appearance="subtle">
-              Close
-            </Button>
-          </Modal.Footer>
-        </Modal>
-      </>
-    );
-  }
-}
+      <Modal open={isCartDialogOpen} onClose={handleCloseCartDialog}>
+        <Modal.Header>
+          <Modal.Title>Cart items</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {isNotificationVisible && (
+            <Message type="success">
+              Congratulations! Here is your special promo code: 'fs#Rsf513'
+            </Message>
+          )}
+
+          {isCartEmpty ? (
+            <h4>Your cart is empty.</h4>
+          ) : (
+            <StyledCartItemsList bordered>
+              {cartItems.map((item, index) => (
+                <StyledCartItem key={item.id + index} index={index}>
+                  {item.title}
+                  <Price>{item.price} $</Price>
+                  <StyledIconButton
+                    circle
+                    icon={<FaTrashAlt />}
+                    color="red"
+                    appearance="primary"
+                    size="md"
+                    onClick={handleOpenCartDialog}
+                  />
+                </StyledCartItem>
+              ))}
+            </StyledCartItemsList>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={handleCloseCartDialog} appearance="subtle">
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </>
+  );
+};
+
+Cart.propTypes = {
+  cartItems: PropTypes.arrayOf(
+    PropTypes.exact({
+      title: PropTypes.string,
+      price: PropTypes.number,
+      id: PropTypes.number,
+    }),
+  ).isRequired,
+};
 
 export default Cart;
