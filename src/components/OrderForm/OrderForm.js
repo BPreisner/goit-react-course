@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { nanoid } from 'nanoid';
 import {
   StyledForm,
@@ -31,98 +31,109 @@ const formValidate = (firstName, lastName, address, city, regulations) => {
   return true;
 };
 
-class OrderForm extends Component {
-  state = {
+const OrderForm = () => {
+  const inputRef = useRef(); // { current: }
+  const firstNameId = useRef(nanoid());
+  const lastNameId = useRef(nanoid());
+  const addressId = useRef(nanoid());
+  const cityId = useRef(nanoid());
+  const regulationsId = useRef(nanoid());
+
+  const [formState, setFormState] = useState({
     firstName: '',
     lastName: '',
     address: '',
     city: '',
-  };
+  });
 
-  handleSubmit = (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
     console.log(event.currentTarget.elements);
   };
 
-  handleInputValueChange = (event) => {
-    this.setState({ [event.target.name]: event.target.value });
+  const handleInputValueChange = (event) => {
+    setFormState((prevState) => ({
+      ...prevState,
+      [event.target.name]: event.target.value,
+    }));
   };
 
-  handleCheckboxValueChange = (event) => {
-    this.setState({ regulations: event.target.checked });
+  const handleCheckboxValueChange = (event) => {
+    setFormState((prevState) => ({
+      ...prevState,
+      regulations: event.target.checked,
+    }));
   };
 
-  render() {
-    const { firstName, lastName, address, city, regulations } = this.state;
-    const isSubmitButtonEnabled = formValidate(
-      firstName,
-      lastName,
-      address,
-      city,
-      regulations,
-    );
+  useEffect(() => {
+    inputRef.current.focus();
+  }, []);
 
-    const firstNameId = nanoid();
-    const lastNameId = nanoid();
-    const addressId = nanoid();
-    const cityId = nanoid();
-    const regulationsId = nanoid();
+  const { firstName, lastName, address, city, regulations } = formState;
 
-    return (
-      <div>
-        <StyledForm onSubmit={this.handleSubmit}>
-          <label htmlFor={firstNameId}>First name:</label>
-          <StyledInput
-            id={firstNameId}
-            name="firstName"
-            placeholder="First name"
-            value={this.state.firstName}
-            onChange={this.handleInputValueChange}
+  const isSubmitButtonEnabled = formValidate(
+    firstName,
+    lastName,
+    address,
+    city,
+    regulations,
+  );
+
+  return (
+    <div>
+      <StyledForm onSubmit={handleSubmit}>
+        <label htmlFor={firstNameId.current}>First name:</label>
+        <StyledInput
+          ref={inputRef}
+          id={firstNameId.current}
+          name="firstName"
+          placeholder="First name"
+          value={formState.firstName}
+          onChange={handleInputValueChange}
+        />
+
+        <label htmlFor={lastNameId.current}>Last name:</label>
+        <StyledInput
+          id={lastNameId.current}
+          name="lastName"
+          placeholder="Last name"
+          value={formState.lastName}
+          onChange={handleInputValueChange}
+        />
+
+        <label htmlFor={addressId.current}>Address:</label>
+        <StyledInput
+          id={addressId.current}
+          name="address"
+          placeholder="Address"
+          value={formState.address}
+          onChange={handleInputValueChange}
+        />
+
+        <label htmlFor={cityId.current}>City:</label>
+        <StyledInput
+          id={cityId.current}
+          name="city"
+          placeholder="City"
+          value={formState.city}
+          onChange={handleInputValueChange}
+        />
+
+        <Checkbox>
+          <label htmlFor={regulationsId}>Accept Regulations:</label>
+          <input
+            id={regulationsId}
+            type="checkbox"
+            name="regulations"
+            value={formState.regulations}
+            onChange={handleCheckboxValueChange}
           />
+        </Checkbox>
 
-          <label htmlFor={lastNameId}>Last name:</label>
-          <StyledInput
-            id={lastNameId}
-            name="lastName"
-            placeholder="Last name"
-            value={this.state.lastName}
-            onChange={this.handleInputValueChange}
-          />
-
-          <label htmlFor={addressId}>Address:</label>
-          <StyledInput
-            id={addressId}
-            name="address"
-            placeholder="Address"
-            value={this.state.address}
-            onChange={this.handleInputValueChange}
-          />
-
-          <label htmlFor={cityId}>City:</label>
-          <StyledInput
-            id={cityId}
-            name="city"
-            placeholder="City"
-            value={this.state.city}
-            onChange={this.handleInputValueChange}
-          />
-
-          <Checkbox>
-            <label htmlFor={regulationsId}>Accept Regulations:</label>
-            <input
-              id={regulationsId}
-              type="checkbox"
-              name="regulations"
-              value={this.state.regulations}
-              onChange={this.handleCheckboxValueChange}
-            />
-          </Checkbox>
-
-          <SubmitButton disabled={!isSubmitButtonEnabled}>Submit</SubmitButton>
-        </StyledForm>
-      </div>
-    );
-  }
-}
+        <SubmitButton disabled={!isSubmitButtonEnabled}>Submit</SubmitButton>
+      </StyledForm>
+    </div>
+  );
+};
 
 export default OrderForm;

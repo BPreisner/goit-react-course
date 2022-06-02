@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { FaShoppingCart, FaTrashAlt } from 'react-icons/fa';
 import PropTypes from 'prop-types';
 import { Modal, Button, Message } from 'rsuite';
@@ -10,6 +10,8 @@ import {
 } from './Cart.styles';
 import { useToggle } from '../../hooks/useToggle';
 
+const calculateTotalPrice = (cartItems) => {};
+
 const Cart = ({ cartItems }) => {
   const {
     isOpen: isCartDialogOpen,
@@ -18,17 +20,18 @@ const Cart = ({ cartItems }) => {
   } = useToggle();
   const [isNotificationVisible, setIsNotificationVisible] = useState(false);
 
+  const totalPrice = useMemo(() => calculateTotalPrice(cartItems), [cartItems]);
+
   const isCartEmpty = cartItems.length === 0;
-  let timeout = null;
+  const setTimeoutRef = useRef(null); // { current: null }
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    timeout = setTimeout(() => {
+    setTimeoutRef.current = setTimeout(() => {
       setIsNotificationVisible(true);
     }, 5000);
 
     return () => {
-      clearTimeout(timeout);
+      clearTimeout(setTimeoutRef.current);
     };
   }, []);
 
