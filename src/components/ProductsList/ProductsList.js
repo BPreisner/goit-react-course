@@ -16,31 +16,23 @@ import { useApi } from '../../hooks/useApi';
 const ProductsList = (props) => {
   const authneticationContext = useAuthneticationContext();
   const [cartItems, setCartItems] = useState([]);
-  const [products, setProducts] = useState({
-    items: [],
-    isError: false,
-    isLoading: false,
-    sortDirection: 'asc',
-  });
+  const [sortDirection, setSortDirection] = useState('asc');
 
   const [{ data: productItems, isLoading, isError }, fetch] =
     useApi(getProducts);
 
   useEffect(() => {
     fetch({
-      sortDirection: products.sortDirection,
+      sortDirection: sortDirection,
     });
-  }, [fetch, products.sortDirection]);
+  }, [fetch, sortDirection]);
 
   const handleAddProductToBasket = (productInfo) => (event) => {
-    setCartItems((prevState) => [...prevState.cartItems, productInfo]);
+    setCartItems((prevState) => [...prevState, productInfo]);
   };
 
   const handleSortChange = () => {
-    setProducts((prevState) => ({
-      ...prevState,
-      sortDirection: prevState.sortDirection === 'asc' ? 'desc' : 'asc',
-    }));
+    setSortDirection((prevState) => (prevState === 'asc' ? 'desc' : 'asc'));
   };
 
   return (
@@ -58,11 +50,7 @@ const ProductsList = (props) => {
 
             <StyledButton onClick={handleSortChange}>
               Sorting:
-              {products.sortDirection === 'asc' ? (
-                <FaArrowDown />
-              ) : (
-                <FaArrowUp />
-              )}
+              {sortDirection === 'asc' ? <FaArrowDown /> : <FaArrowUp />}
             </StyledButton>
           </NavBarContent>
         </Panel>

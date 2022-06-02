@@ -17,8 +17,18 @@ export const StyledCartItem = styled(List.Item)`
 `;
 
 export const Price = styled.p`
+  display: inline-block;
   font-weight: bold;
   color: green;
   min-width: 70px;
   text-align: right;
+`;
+
+export const TotalPriceWrapper = styled.div`
+  padding: 12px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  font-weight: bold;
+  font-size: 20px;
 `;

@@ -7,10 +7,15 @@ import {
   StyledCartItemsList,
   StyledCartItem,
   Price,
+  TotalPriceWrapper,
 } from './Cart.styles';
 import { useToggle } from '../../hooks/useToggle';
 
-const calculateTotalPrice = (cartItems) => {};
+const calculateTotalPrice = (cartItems) => {
+  return cartItems.reduce((acc, curr) => {
+    return (acc += curr.price);
+  }, 0);
+};
 
 const Cart = ({ cartItems }) => {
   const {
@@ -26,14 +31,16 @@ const Cart = ({ cartItems }) => {
   const setTimeoutRef = useRef(null); // { current: null }
 
   useEffect(() => {
-    setTimeoutRef.current = setTimeout(() => {
-      setIsNotificationVisible(true);
-    }, 5000);
+    if (isCartDialogOpen) {
+      setTimeoutRef.current = setTimeout(() => {
+        setIsNotificationVisible(true);
+      }, 5000);
+    }
 
     return () => {
       clearTimeout(setTimeoutRef.current);
     };
-  }, []);
+  }, [isCartDialogOpen]);
 
   const handleOpenCartDialog = () => {
     openCartDialog();
@@ -68,27 +75,36 @@ const Cart = ({ cartItems }) => {
           {isCartEmpty ? (
             <h4>Your cart is empty.</h4>
           ) : (
-            <StyledCartItemsList bordered>
-              {cartItems.map((item, index) => (
-                <StyledCartItem key={item.id + index} index={index}>
-                  {item.title}
-                  <Price>{item.price} $</Price>
-                  <StyledIconButton
-                    circle
-                    icon={<FaTrashAlt />}
-                    color="red"
-                    appearance="primary"
-                    size="md"
-                    onClick={handleOpenCartDialog}
-                  />
-                </StyledCartItem>
-              ))}
-            </StyledCartItemsList>
+            <>
+              <StyledCartItemsList bordered>
+                {cartItems.map((item, index) => (
+                  <StyledCartItem key={item.id + index} index={index}>
+                    {item.title}
+                    <Price>{item.price} $</Price>
+                    <StyledIconButton
+                      circle
+                      icon={<FaTrashAlt />}
+                      color="red"
+                      appearance="primary"
+                      size="md"
+                      onClick={handleOpenCartDialog}
+                    />
+                  </StyledCartItem>
+                ))}
+              </StyledCartItemsList>
+              <TotalPriceWrapper>
+                Total price: <Price>{totalPrice} $</Price>
+              </TotalPriceWrapper>
+            </>
           )}
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={handleCloseCartDialog} appearance="subtle">
-            Close
+          <Button
+            onClick={handleCloseCartDialog}
+            appearance="primary"
+            color="green"
+          >
+            Proceed to checkout
           </Button>
         </Modal.Footer>
       </Modal>
