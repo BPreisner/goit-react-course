@@ -1,4 +1,11 @@
 import styled from 'styled-components';
+import { Button } from 'rsuite';
+
+export const LoginFormContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
 
 export const StyledForm = styled.form`
   padding: 15px;
@@ -32,35 +39,6 @@ export const StyledInput = styled.input`
   }
 `;
 
-export const Checkbox = styled.div``;
-
-export const SubmitButton = styled.button`
-  border: none;
-  background-color: #3997d6;
-  border-radius: 20px;
-  padding: 10px;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 30px;
-  cursor: pointer;
-
-  &:not(:disabled) {
-    &:hover {
-      color: white;
-      opacity: 0.9;
-    }
-
-    &:active {
-      transform: none;
-    }
-  }
-
-  &:disabled {
-    background-color: grey;
-    color: black;
-    cursor: not-allowed;
-  }
+export const SubmitButton = styled(Button)`
+  margin-top: 20px;
 `;

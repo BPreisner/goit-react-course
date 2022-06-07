@@ -9,3 +9,21 @@ export const getProducts = async ({ sortDirection } = {}) => {
 
   return data;
 };
+
+export const getProductById = async (id) => {
+  const { data } = await storeApiClient.get(`/products/${id}`);
+
+  return data;
+};
+
+export const createUser = async (payload) => {
+  const { data } = await storeApiClient.post('/users', payload);
+
+  return data;
+};
+
+export const authenticateUser = async (payload) => {
+  const { data } = await storeApiClient.post('/auth/login', payload);
+
+  return data;
+};

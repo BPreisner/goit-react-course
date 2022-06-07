@@ -11,13 +11,13 @@ import {
 } from './Cart.styles';
 import { useToggle } from '../../hooks/useToggle';
 
-const calculateTotalPrice = (cartItems) => {
-  return cartItems.reduce((acc, curr) => {
-    return (acc += curr.price);
+const calculateTotalPrice = (cartItemsList, cartItemsById) => {
+  return cartItemsList.reduce((acc, id) => {
+    return (acc += cartItemsById[id].price * cartItemsById[id].count);
   }, 0);
 };
 
-const Cart = ({ cartItems }) => {
+const Cart = ({ cartItemsById, cartItemsList, onRemoveProductFromCart }) => {
   const {
     isOpen: isCartDialogOpen,
     close: closeCartDialog,
@@ -25,9 +25,12 @@ const Cart = ({ cartItems }) => {
   } = useToggle();
   const [isNotificationVisible, setIsNotificationVisible] = useState(false);
 
-  const totalPrice = useMemo(() => calculateTotalPrice(cartItems), [cartItems]);
+  const totalPrice = useMemo(
+    () => calculateTotalPrice(cartItemsList, cartItemsById),
+    [cartItemsList, cartItemsById],
+  );
 
-  const isCartEmpty = cartItems.length === 0;
+  const isCartEmpty = cartItemsList.length === 0;
   const setTimeoutRef = useRef(null); // { current: null }
 
   useEffect(() => {
@@ -77,23 +80,24 @@ const Cart = ({ cartItems }) => {
           ) : (
             <>
               <StyledCartItemsList bordered>
-                {cartItems.map((item, index) => (
-                  <StyledCartItem key={item.id + index} index={index}>
-                    {item.title}
-                    <Price>{item.price} $</Price>
+                {cartItemsList.map((id) => (
+                  <StyledCartItem key={id} index={id}>
+                    {cartItemsById[id].title}
+                    <div>{cartItemsById[id].count}</div>
+                    <Price>{cartItemsById[id].price} $</Price>
                     <StyledIconButton
                       circle
                       icon={<FaTrashAlt />}
                       color="red"
                       appearance="primary"
                       size="md"
-                      onClick={handleOpenCartDialog}
+                      onClick={onRemoveProductFromCart(id)}
                     />
                   </StyledCartItem>
                 ))}
               </StyledCartItemsList>
               <TotalPriceWrapper>
-                Total price: <Price>{totalPrice} $</Price>
+                Total price: <Price>{totalPrice.toFixed(2)} $</Price>
               </TotalPriceWrapper>
             </>
           )}
@@ -113,13 +117,15 @@ const Cart = ({ cartItems }) => {
 };
 
 Cart.propTypes = {
-  cartItems: PropTypes.arrayOf(
-    PropTypes.exact({
+  cartItemsById: PropTypes.shape({
+    [PropTypes.number]: PropTypes.exact({
       title: PropTypes.string,
       price: PropTypes.number,
       id: PropTypes.number,
     }),
-  ).isRequired,
+  }).isRequired,
+  cartItemsList: PropTypes.arrayOf(PropTypes.number).isRequired,
+  onRemoveProductFromCart: PropTypes.func.isRequired,
 };
 
 export default Cart;

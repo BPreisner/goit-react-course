@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { Panel, Button } from 'rsuite';
 
-export const ProductCard = styled(Panel)`
+export const ProductPanel = styled(Panel)`
   margin: 10px 0;
 `;
 

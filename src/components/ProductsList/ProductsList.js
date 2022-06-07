@@ -1,7 +1,7 @@
 import { FaArrowDown, FaArrowUp } from 'react-icons/fa';
 import { Loader, Message, Panel } from 'rsuite';
-import { useState, useEffect } from 'react';
-import Product from '../Product/Product';
+import { useState, useEffect, isValidElement } from 'react';
+import ProductCard from '../ProductCard/ProductCard';
 import {
   Layout,
   StyledProductsList,
@@ -13,9 +13,12 @@ import { getProducts } from '../../api/requests';
 import { useAuthneticationContext } from '../AuthenticationProvider/AuthenticationProvider';
 import { useApi } from '../../hooks/useApi';
 
-const ProductsList = (props) => {
+const ProductsList = () => {
   const authneticationContext = useAuthneticationContext();
-  const [cartItems, setCartItems] = useState([]);
+  const [cart, setCart] = useState({
+    itemsById: {},
+    itemsList: [],
+  });
   const [sortDirection, setSortDirection] = useState('asc');
 
   const [{ data: productItems, isLoading, isError }, fetch] =
@@ -28,7 +31,51 @@ const ProductsList = (props) => {
   }, [fetch, sortDirection]);
 
   const handleAddProductToBasket = (productInfo) => (event) => {
-    setCartItems((prevState) => [...prevState, productInfo]);
+    event.preventDefault();
+
+    setCart((prevState) => {
+      if (prevState.itemsById[productInfo.id]) {
+        return {
+          ...prevState,
+          itemsById: {
+            ...prevState.itemsById,
+            [productInfo.id]: {
+              ...prevState.itemsById[productInfo.id],
+              count: prevState.itemsById[productInfo.id].count + 1,
+            },
+          },
+        };
+      }
+
+      return {
+        itemsList: [...prevState.itemsList, productInfo.id],
+        itemsById: {
+          ...prevState.itemsById,
+          [productInfo.id]: {
+            ...productInfo,
+            count: 1,
+          },
+        },
+      };
+    });
+  };
+
+  const handleRemoveProductFromBasket = (productId) => (event) => {
+    setCart((prevState) => {
+      const newItemsById = {
+        ...prevState.itemsById,
+      };
+
+      const {
+        [productId]: _removedProduct,
+        ...itemsByIdWithoutRemovedProduct
+      } = newItemsById;
+
+      return {
+        itemsList: prevState.itemsList.filter((id) => id !== productId),
+        itemsById: itemsByIdWithoutRemovedProduct,
+      };
+    });
   };
 
   const handleSortChange = () => {
@@ -40,7 +87,11 @@ const ProductsList = (props) => {
       <Layout>
         <Panel shaded>
           <NavBarContent>
-            <Cart cartItems={cartItems} />
+            <Cart
+              cartItemsList={cart.itemsList}
+              cartItemsById={cart.itemsById}
+              onRemoveProductFromCart={handleRemoveProductFromBasket}
+            />
           </NavBarContent>
         </Panel>
 
@@ -66,8 +117,9 @@ const ProductsList = (props) => {
                   const { id, title, price, image, description } = product;
 
                   return (
-                    <Product
+                    <ProductCard
                       key={id}
+                      productId={id}
                       title={title}
                       price={price}
                       description={description}
