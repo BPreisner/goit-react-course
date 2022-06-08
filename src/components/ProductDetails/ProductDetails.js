@@ -1,7 +1,7 @@
 import { FaCartPlus } from 'react-icons/fa';
 import { useEffect } from 'react';
 import { Loader } from 'rsuite';
-import { useParams } from 'react-router-dom';
+import { useParams, Outlet } from 'react-router-dom';
 import {
   ProductWrapper,
   StyledButton,
@@ -33,6 +33,7 @@ const ProductDetails = () => {
       ) : (
         <ProductWrapper>
           <ProductImage src={image} alt={title} />
+          <Outlet />
           <ProductInfo>
             <h3>{title}</h3>
             <Text>{description}</Text>

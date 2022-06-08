@@ -1,6 +1,7 @@
 import { FaArrowDown, FaArrowUp } from 'react-icons/fa';
 import { Loader, Message, Panel } from 'rsuite';
-import { useState, useEffect, isValidElement } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import ProductCard from '../ProductCard/ProductCard';
 import {
   Layout,
@@ -13,13 +14,24 @@ import { getProducts } from '../../api/requests';
 import { useAuthneticationContext } from '../AuthenticationProvider/AuthenticationProvider';
 import { useApi } from '../../hooks/useApi';
 
+const validateSortingQuery = (sortingValue) => {
+  if (['asc', 'desc'].includes(sortingValue)) {
+    return sortingValue;
+  } else {
+    return 'asc';
+  }
+};
+
 const ProductsList = () => {
   const authneticationContext = useAuthneticationContext();
   const [cart, setCart] = useState({
     itemsById: {},
     itemsList: [],
   });
-  const [sortDirection, setSortDirection] = useState('asc');
+  let [searchParams, setSearchParams] = useSearchParams();
+  const [sortDirection, setSortDirection] = useState(
+    validateSortingQuery(searchParams.get('sort')),
+  );
 
   const [{ data: productItems, isLoading, isError }, fetch] =
     useApi(getProducts);
@@ -81,6 +93,10 @@ const ProductsList = () => {
   const handleSortChange = () => {
     setSortDirection((prevState) => (prevState === 'asc' ? 'desc' : 'asc'));
   };
+
+  useEffect(() => {
+    setSearchParams({ sort: sortDirection });
+  }, [setSearchParams, sortDirection]);
 
   return (
     authneticationContext.isUserAuthenticated && (

@@ -25,10 +25,10 @@ const ProductCard = ({
   const isAddToCardActive = price > 0;
 
   return (
-    <StyledLink to={`/product/${productId}`}>
+    <StyledLink to={`${productId}`}>
       <ProductPanel shaded>
         <ProductWrapper>
-          <ProductImage src={image} alt={title} />
+          <ProductImage loading="lazy" src={image} alt={title} />
           <ProductInfo>
             <h3>{title}</h3>
             <Text>{description}</Text>

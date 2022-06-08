@@ -1,5 +1,6 @@
 import { Navbar, Nav } from 'rsuite';
 import { Outlet, useNavigate, useMatch } from 'react-router-dom';
+import { FaShoppingCart } from 'react-icons/fa';
 
 const Layout = () => {
   const navigate = useNavigate();
@@ -28,6 +29,10 @@ const Layout = () => {
           <Nav.Item active={!!products} eventKey="/products">
             Products List
           </Nav.Item>
+        </Nav>
+
+        <Nav pullRight>
+          <Nav.Item icon={<FaShoppingCart />}>Cart</Nav.Item>
         </Nav>
       </Navbar>
 
