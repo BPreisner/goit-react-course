@@ -13,18 +13,26 @@ import {
 } from './ProductDetails.styles';
 import { getProductById } from '../../api/requests';
 import { useApi } from '../../hooks/useApi';
+import { useCartContext } from '../CartProvider/CartProvider';
 
 const ProductDetails = () => {
   const [{ data: product, isLoading }, getProduct] = useApi(getProductById);
+  const { dispatch } = useCartContext();
   const params = useParams();
   const productId = params.productId;
 
-  const { image, title, description, amount, currency, isAddToCardActive } =
-    product;
+  const { image, title, description, price } = product;
 
   useEffect(() => {
     getProduct(productId);
   }, [getProduct, productId]);
+
+  const handleAddProductToBasket = () => {
+    dispatch({
+      type: 'ADD_PRODUCT_TO_CART',
+      productInfo: { title, id: productId, price },
+    });
+  };
 
   return (
     <ProductPanel>
@@ -37,15 +45,12 @@ const ProductDetails = () => {
           <ProductInfo>
             <h3>{title}</h3>
             <Text>{description}</Text>
-            <Price>
-              {amount} {currency}
-            </Price>
+            <Price>{price} $</Price>
             <StyledButton
               color="green"
               appearance="primary"
-              disabled={!isAddToCardActive}
               type="button"
-              // onClick={onProductClick}
+              onClick={handleAddProductToBasket}
             >
               <FaCartPlus />
               Add to cart

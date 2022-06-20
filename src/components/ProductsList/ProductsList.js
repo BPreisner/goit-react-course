@@ -12,6 +12,7 @@ import {
 import Cart from '../Cart/Cart';
 import { getProducts } from '../../api/requests';
 import { useAuthneticationContext } from '../AuthenticationProvider/AuthenticationProvider';
+import { useCartContext } from '../CartProvider/CartProvider';
 import { useApi } from '../../hooks/useApi';
 
 const validateSortingQuery = (sortingValue) => {
@@ -24,10 +25,8 @@ const validateSortingQuery = (sortingValue) => {
 
 const ProductsList = () => {
   const authneticationContext = useAuthneticationContext();
-  const [cart, setCart] = useState({
-    itemsById: {},
-    itemsList: [],
-  });
+  const { cartState, dispatch } = useCartContext();
+
   let [searchParams, setSearchParams] = useSearchParams();
   const [sortDirection, setSortDirection] = useState(
     validateSortingQuery(searchParams.get('sort')),
@@ -45,48 +44,13 @@ const ProductsList = () => {
   const handleAddProductToBasket = (productInfo) => (event) => {
     event.preventDefault();
 
-    setCart((prevState) => {
-      if (prevState.itemsById[productInfo.id]) {
-        return {
-          ...prevState,
-          itemsById: {
-            ...prevState.itemsById,
-            [productInfo.id]: {
-              ...prevState.itemsById[productInfo.id],
-              count: prevState.itemsById[productInfo.id].count + 1,
-            },
-          },
-        };
-      }
-
-      return {
-        itemsList: [...prevState.itemsList, productInfo.id],
-        itemsById: {
-          ...prevState.itemsById,
-          [productInfo.id]: {
-            ...productInfo,
-            count: 1,
-          },
-        },
-      };
-    });
+    dispatch({ type: 'ADD_PRODUCT_TO_CART', productInfo });
   };
 
   const handleRemoveProductFromBasket = (productId) => (event) => {
-    setCart((prevState) => {
-      const newItemsById = {
-        ...prevState.itemsById,
-      };
-
-      const {
-        [productId]: _removedProduct,
-        ...itemsByIdWithoutRemovedProduct
-      } = newItemsById;
-
-      return {
-        itemsList: prevState.itemsList.filter((id) => id !== productId),
-        itemsById: itemsByIdWithoutRemovedProduct,
-      };
+    dispatch({
+      type: 'REMOVE_PRODUCT_FROM_CART',
+      productId,
     });
   };
 
@@ -104,8 +68,8 @@ const ProductsList = () => {
         <Panel shaded>
           <NavBarContent>
             <Cart
-              cartItemsList={cart.itemsList}
-              cartItemsById={cart.itemsById}
+              cartItemsList={cartState.itemsList}
+              cartItemsById={cartState.itemsById}
               onRemoveProductFromCart={handleRemoveProductFromBasket}
             />
           </NavBarContent>
@@ -154,6 +118,6 @@ const ProductsList = () => {
       </Layout>
     )
   );
-};
+};;;;;
 
 export default ProductsList;
