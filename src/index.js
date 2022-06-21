@@ -1,11 +1,14 @@
 import { lazy, Suspense } from 'react';
+import { Provider } from 'react-redux';
+import { composeWithDevTools } from 'redux-devtools-extension';
+import { createStore } from 'redux';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import ReactDOM from 'react-dom/client';
 import { Loader } from 'rsuite';
 import './index.css';
 import { AuthneticationContextProvider } from './components/AuthenticationProvider/AuthenticationProvider';
-import { CartContextProvider } from './components/CartProvider/CartProvider';
 import Layout from './components/Layout/Layout';
+import { cartReducer } from './store/Cart/reducers';
 
 import 'rsuite/dist/rsuite.min.css';
 
@@ -25,9 +28,13 @@ const ProductsList = lazy(() =>
   import('./components/ProductsList/ProductsList'),
 );
 
+const composedEnhancer = composeWithDevTools();
+
+const store = createStore(cartReducer, composedEnhancer);
+
 root.render(
-  <AuthneticationContextProvider>
-    <CartContextProvider>
+  <Provider store={store}>
+    <AuthneticationContextProvider>
       <BrowserRouter>
         <Suspense fallback={<Loader />}>
           <Routes>
@@ -44,6 +51,6 @@ root.render(
           </Routes>
         </Suspense>
       </BrowserRouter>
-    </CartContextProvider>
-  </AuthneticationContextProvider>,
+    </AuthneticationContextProvider>
+  </Provider>,
 );

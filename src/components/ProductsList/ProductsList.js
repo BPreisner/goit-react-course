@@ -1,5 +1,6 @@
 import { FaArrowDown, FaArrowUp } from 'react-icons/fa';
 import { Loader, Message, Panel } from 'rsuite';
+import { useSelector, useDispatch } from 'react-redux';
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import ProductCard from '../ProductCard/ProductCard';
@@ -12,8 +13,11 @@ import {
 import Cart from '../Cart/Cart';
 import { getProducts } from '../../api/requests';
 import { useAuthneticationContext } from '../AuthenticationProvider/AuthenticationProvider';
-import { useCartContext } from '../CartProvider/CartProvider';
 import { useApi } from '../../hooks/useApi';
+import {
+  addProductsToCart,
+  removeProductFromCart,
+} from '../../store/Cart/actions';
 
 const validateSortingQuery = (sortingValue) => {
   if (['asc', 'desc'].includes(sortingValue)) {
@@ -23,9 +27,16 @@ const validateSortingQuery = (sortingValue) => {
   }
 };
 
+const getItemsList = (state) => state.itemsList;
+const getItemsById = (state) => state.itemsById;
+
 const ProductsList = () => {
   const authneticationContext = useAuthneticationContext();
-  const { cartState, dispatch } = useCartContext();
+
+  const itemsList = useSelector(getItemsList);
+  const itemsById = useSelector(getItemsById);
+
+  const dispatch = useDispatch();
 
   let [searchParams, setSearchParams] = useSearchParams();
   const [sortDirection, setSortDirection] = useState(
@@ -44,14 +55,11 @@ const ProductsList = () => {
   const handleAddProductToBasket = (productInfo) => (event) => {
     event.preventDefault();
 
-    dispatch({ type: 'ADD_PRODUCT_TO_CART', productInfo });
+    dispatch(addProductsToCart(productInfo));
   };
 
   const handleRemoveProductFromBasket = (productId) => (event) => {
-    dispatch({
-      type: 'REMOVE_PRODUCT_FROM_CART',
-      productId,
-    });
+    dispatch(removeProductFromCart(productId));
   };
 
   const handleSortChange = () => {
@@ -68,8 +76,8 @@ const ProductsList = () => {
         <Panel shaded>
           <NavBarContent>
             <Cart
-              cartItemsList={cartState.itemsList}
-              cartItemsById={cartState.itemsById}
+              cartItemsList={itemsList}
+              cartItemsById={itemsById}
               onRemoveProductFromCart={handleRemoveProductFromBasket}
             />
           </NavBarContent>

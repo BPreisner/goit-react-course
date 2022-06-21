@@ -1,4 +1,5 @@
 import { FaCartPlus } from 'react-icons/fa';
+import { useDispatch } from 'react-redux';
 import { useEffect } from 'react';
 import { Loader } from 'rsuite';
 import { useParams, Outlet } from 'react-router-dom';
@@ -13,11 +14,11 @@ import {
 } from './ProductDetails.styles';
 import { getProductById } from '../../api/requests';
 import { useApi } from '../../hooks/useApi';
-import { useCartContext } from '../CartProvider/CartProvider';
+import { addProductsToCart } from '../../store/Cart/actions';
 
 const ProductDetails = () => {
   const [{ data: product, isLoading }, getProduct] = useApi(getProductById);
-  const { dispatch } = useCartContext();
+  const dispatch = useDispatch();
   const params = useParams();
   const productId = params.productId;
 
@@ -28,10 +29,7 @@ const ProductDetails = () => {
   }, [getProduct, productId]);
 
   const handleAddProductToBasket = () => {
-    dispatch({
-      type: 'ADD_PRODUCT_TO_CART',
-      productInfo: { title, id: productId, price },
-    });
+    dispatch(addProductsToCart({ title, id: productId, price }));
   };
 
   return (
