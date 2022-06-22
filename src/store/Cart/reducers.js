@@ -1,58 +1,37 @@
-import { ActionTypes, initialState } from './constants';
+import { initialState } from './constants';
+import { createSlice } from '@reduxjs/toolkit';
 
-export const cartReducer = (state = initialState, action) => {
-  switch (action.type) {
-    case ActionTypes.AddProductsToCart: {
+export const cartReducerSlice = createSlice({
+  name: 'cart',
+  initialState,
+  reducers: {
+    addProductsToCart(state, action) {
       const {
         payload: { productInfo },
       } = action;
 
       if (state.itemsById[productInfo.id]) {
-        return {
-          ...state,
-          itemsById: {
-            ...state.itemsById,
-            [productInfo.id]: {
-              ...state.itemsById[productInfo.id],
-              count: state.itemsById[productInfo.id].count + 1,
-            },
-          },
+        state.itemsById[productInfo.id].count += 1;
+      } else {
+        state.itemsList.push(productInfo.id);
+
+        state.itemsById[productInfo.id] = {
+          ...productInfo,
+          count: 1,
         };
       }
-
-      return {
-        itemsList: [...state.itemsList, productInfo.id],
-        itemsById: {
-          ...state.itemsById,
-          [productInfo.id]: {
-            ...productInfo,
-            count: 1,
-          },
-        },
-      };
-    }
-
-    case ActionTypes.RemoveProductFromCart: {
+    },
+    
+    removeProductFromCart(state, action) {
       const {
         payload: { productId },
       } = action;
 
-      const newItemsById = {
-        ...state.itemsById,
-      };
+      state.itemsList = state.itemsList.filter((id) => id !== productId);
 
-      const {
-        [productId]: _removedProduct,
-        ...itemsByIdWithoutRemovedProduct
-      } = newItemsById;
+      delete state.itemsById[productId];
+    },
+  },
+});
 
-      return {
-        itemsList: state.itemsList.filter((id) => id !== productId),
-        itemsById: itemsByIdWithoutRemovedProduct,
-      };
-    }
-
-    default:
-      return state;
-  }
-};
+export default cartReducerSlice.reducer;

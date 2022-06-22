@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { nanoid } from 'nanoid';
 import {
@@ -8,12 +9,12 @@ import {
   LoginFormContainer,
 } from './LoginForm.styles';
 import { useApi } from '../../hooks/useApi';
-import { useAuthneticationContext } from '../AuthenticationProvider/AuthenticationProvider';
-import { authenticateUser } from '../../api/requests';
+import { authenticateUserRequest } from '../../api/requests';
+import { authenticateUser } from '../../store/Auth/actions';
 
 const LoginForm = () => {
-  const authneticationContext = useAuthneticationContext();
-  const [{ data, isLoading }, login] = useApi(authenticateUser);
+  const dispatch = useDispatch();
+  const [{ data, isLoading }, login] = useApi(authenticateUserRequest);
   const navigate = useNavigate();
 
   const usernameId = useRef(nanoid());
@@ -42,11 +43,11 @@ const LoginForm = () => {
 
   useEffect(() => {
     if (data.token) {
-      authneticationContext.setIsUserAuthenticated(true);
+      dispatch(authenticateUser());
 
       navigate('/products');
     }
-  }, [data, authneticationContext, navigate]);
+  }, [data, dispatch, navigate]);
 
   return (
     <LoginFormContainer>

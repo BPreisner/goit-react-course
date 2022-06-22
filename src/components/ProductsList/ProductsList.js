@@ -12,12 +12,13 @@ import {
 } from './ProductsList.styles';
 import Cart from '../Cart/Cart';
 import { getProducts } from '../../api/requests';
-import { useAuthneticationContext } from '../AuthenticationProvider/AuthenticationProvider';
 import { useApi } from '../../hooks/useApi';
 import {
   addProductsToCart,
   removeProductFromCart,
 } from '../../store/Cart/actions';
+import { getItemsById, getItemsList } from '../../store/Cart/selectors';
+import { getIsUserAuthenticated } from '../../store/Auth/selectors';
 
 const validateSortingQuery = (sortingValue) => {
   if (['asc', 'desc'].includes(sortingValue)) {
@@ -27,14 +28,10 @@ const validateSortingQuery = (sortingValue) => {
   }
 };
 
-const getItemsList = (state) => state.itemsList;
-const getItemsById = (state) => state.itemsById;
-
 const ProductsList = () => {
-  const authneticationContext = useAuthneticationContext();
-
   const itemsList = useSelector(getItemsList);
   const itemsById = useSelector(getItemsById);
+  const isUserAuthenticated = useSelector(getIsUserAuthenticated);
 
   const dispatch = useDispatch();
 
@@ -55,11 +52,11 @@ const ProductsList = () => {
   const handleAddProductToBasket = (productInfo) => (event) => {
     event.preventDefault();
 
-    dispatch(addProductsToCart(productInfo));
+    dispatch(addProductsToCart({ productInfo: productInfo }));
   };
 
   const handleRemoveProductFromBasket = (productId) => (event) => {
-    dispatch(removeProductFromCart(productId));
+    dispatch(removeProductFromCart({ productId: productId }));
   };
 
   const handleSortChange = () => {
@@ -71,7 +68,7 @@ const ProductsList = () => {
   }, [setSearchParams, sortDirection]);
 
   return (
-    authneticationContext.isUserAuthenticated && (
+    isUserAuthenticated && (
       <Layout>
         <Panel shaded>
           <NavBarContent>

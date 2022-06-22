@@ -1,15 +1,4 @@
-import { ActionTypes } from './constants';
+import { cartReducerSlice } from './reducers'
 
-export const addProductsToCart = (productInfo) => ({
-  type: ActionTypes.AddProductsToCart,
-  payload: {
-    productInfo,
-  },
-});
-
-export const removeProductFromCart = (productId) => ({
-  type: ActionTypes.RemoveProductFromCart,
-  payload: {
-    productId,
-  },
-});
+export const { addProductsToCart, removeProductFromCart } =
+  cartReducerSlice.actions;

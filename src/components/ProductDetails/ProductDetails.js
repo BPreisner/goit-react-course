@@ -29,7 +29,9 @@ const ProductDetails = () => {
   }, [getProduct, productId]);
 
   const handleAddProductToBasket = () => {
-    dispatch(addProductsToCart({ title, id: productId, price }));
+    dispatch(
+      addProductsToCart({ productInfo: { title, id: productId, price } }),
+    );
   };
 
   return (

@@ -22,7 +22,7 @@ export const createUser = async (payload) => {
   return data;
 };
 
-export const authenticateUser = async (payload) => {
+export const authenticateUserRequest = async (payload) => {
   const { data } = await storeApiClient.post('/auth/login', payload);
 
   return data;
