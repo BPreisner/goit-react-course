@@ -23,6 +23,7 @@ export const productsReducerSlice = createSlice({
           entity: action.payload,
           status: 'success',
         };
+        
       });
   },
 });
