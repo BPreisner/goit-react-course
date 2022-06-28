@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
+// import thunkMiddleware from 'redux-thunk';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import ReactDOM from 'react-dom/client';
 import { Loader } from 'rsuite';
@@ -8,6 +9,7 @@ import './index.css';
 import Layout from './components/Layout/Layout';
 import cartReducer from './store/Cart/reducers';
 import authReducerSlice from './store/Auth/reducers';
+import productsReducerSlice from './store/Products/reducers';
 
 import 'rsuite/dist/rsuite.min.css';
 
@@ -31,6 +33,7 @@ const store = configureStore({
   reducer: {
     cart: cartReducer,
     auth: authReducerSlice,
+    products: productsReducerSlice,
   },
 });
 

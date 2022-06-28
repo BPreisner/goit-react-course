@@ -21,7 +21,7 @@ export const cartReducerSlice = createSlice({
         };
       }
     },
-    
+
     removeProductFromCart(state, action) {
       const {
         payload: { productId },

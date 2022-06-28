@@ -1,7 +1,7 @@
 import { FaCartPlus } from 'react-icons/fa';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
-import { Loader } from 'rsuite';
+import { Loader, Message } from 'rsuite';
 import { useParams, Outlet } from 'react-router-dom';
 import {
   ProductWrapper,
@@ -12,21 +12,21 @@ import {
   ProductInfo,
   ProductPanel,
 } from './ProductDetails.styles';
-import { getProductById } from '../../api/requests';
-import { useApi } from '../../hooks/useApi';
 import { addProductsToCart } from '../../store/Cart/actions';
+import { getProductById } from '../../store/Products/actions';
+import { getProduct } from '../../store/Products/selectors';
 
 const ProductDetails = () => {
-  const [{ data: product, isLoading }, getProduct] = useApi(getProductById);
   const dispatch = useDispatch();
   const params = useParams();
   const productId = params.productId;
-
-  const { image, title, description, price } = product;
+  const product = useSelector((state) => getProduct(state, productId));
 
   useEffect(() => {
-    getProduct(productId);
-  }, [getProduct, productId]);
+    if (!product) {
+      dispatch(getProductById({ productId }));
+    }
+  }, [dispatch, product, productId]);
 
   const handleAddProductToBasket = () => {
     dispatch(
@@ -34,30 +34,36 @@ const ProductDetails = () => {
     );
   };
 
+  if (product?.status === 'fetching' || !product?.status) {
+    return <Loader backdrop content="loading..." vertical />;
+  }
+
+  if (product?.status === 'error') {
+    return <Message type="error">Error</Message>;
+  }
+
+  const { image, title, description, price } = product.entity;
+
   return (
     <ProductPanel>
-      {isLoading ? (
-        <Loader backdrop content="loading..." vertical />
-      ) : (
-        <ProductWrapper>
-          <ProductImage src={image} alt={title} />
-          <Outlet />
-          <ProductInfo>
-            <h3>{title}</h3>
-            <Text>{description}</Text>
-            <Price>{price} $</Price>
-            <StyledButton
-              color="green"
-              appearance="primary"
-              type="button"
-              onClick={handleAddProductToBasket}
-            >
-              <FaCartPlus />
-              Add to cart
-            </StyledButton>
-          </ProductInfo>
-        </ProductWrapper>
-      )}
+      <ProductWrapper>
+        <ProductImage src={image} alt={title} />
+        <Outlet />
+        <ProductInfo>
+          <h3>{title}</h3>
+          <Text>{description}</Text>
+          <Price>{price} $</Price>
+          <StyledButton
+            color="green"
+            appearance="primary"
+            type="button"
+            onClick={handleAddProductToBasket}
+          >
+            <FaCartPlus />
+            Add to cart
+          </StyledButton>
+        </ProductInfo>
+      </ProductWrapper>
     </ProductPanel>
   );
 };
