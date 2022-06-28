@@ -10,8 +10,8 @@ export const getProducts = async ({ sortDirection } = {}) => {
   return data;
 };
 
-export const getProductById = async (id) => {
-  const { data } = await storeApiClient.get(`/products/${id}`);
+export const getProductByIdRequest = async ({ productId }) => {
+  const { data } = await storeApiClient.get(`/products/${productId}`);
 
   return data;
 };
