@@ -1,6 +1,6 @@
 import { storeApiClient } from './client';
 
-export const getProducts = async ({ sortDirection } = {}) => {
+export const getProductsRequest = async ({ sortDirection } = {}) => {
   const { data } = await storeApiClient.get('/products', {
     params: {
       sort: sortDirection,

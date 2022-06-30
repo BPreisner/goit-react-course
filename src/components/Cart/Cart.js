@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import { FaShoppingCart, FaTrashAlt } from 'react-icons/fa';
 import PropTypes from 'prop-types';
 import { Modal, Button, Message } from 'rsuite';
@@ -10,6 +11,7 @@ import {
   TotalPriceWrapper,
 } from './Cart.styles';
 import { useToggle } from '../../hooks/useToggle';
+import { getItemsById, getItemsList } from '../../store/Cart/selectors';
 
 const calculateTotalPrice = (cartItemsList, cartItemsById) => {
   return cartItemsList.reduce((acc, id) => {
@@ -17,7 +19,9 @@ const calculateTotalPrice = (cartItemsList, cartItemsById) => {
   }, 0);
 };
 
-const Cart = ({ cartItemsById, cartItemsList, onRemoveProductFromCart }) => {
+const Cart = ({ onRemoveProductFromCart }) => {
+  const cartItemsList = useSelector(getItemsList);
+  const cartItemsById = useSelector(getItemsById);
   const {
     isOpen: isCartDialogOpen,
     close: closeCartDialog,
@@ -117,14 +121,6 @@ const Cart = ({ cartItemsById, cartItemsList, onRemoveProductFromCart }) => {
 };
 
 Cart.propTypes = {
-  cartItemsById: PropTypes.shape({
-    [PropTypes.number]: PropTypes.exact({
-      title: PropTypes.string,
-      price: PropTypes.number,
-      id: PropTypes.number,
-    }),
-  }).isRequired,
-  cartItemsList: PropTypes.arrayOf(PropTypes.number).isRequired,
   onRemoveProductFromCart: PropTypes.func.isRequired,
 };
 

@@ -1,6 +1,6 @@
 import { FaArrowDown, FaArrowUp } from 'react-icons/fa';
 import { Loader, Message, Panel } from 'rsuite';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector, useDispatch, shallowEqual } from 'react-redux';
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import ProductCard from '../ProductCard/ProductCard';
@@ -11,14 +11,17 @@ import {
   StyledButton,
 } from './ProductsList.styles';
 import Cart from '../Cart/Cart';
-import { getProducts } from '../../api/requests';
-import { useApi } from '../../hooks/useApi';
 import {
   addProductsToCart,
   removeProductFromCart,
 } from '../../store/Cart/actions';
-import { getItemsById, getItemsList } from '../../store/Cart/selectors';
-import { getIsUserAuthenticated } from '../../store/Auth/selectors';
+
+// import { getIsUserAuthenticated } from '../../store/Auth/selectors';
+import { getProducts } from '../../store/Products/actions';
+import {
+  selectSortedProducts,
+  selectProductsStatus,
+} from '../../store/Products/selectors';
 
 const validateSortingQuery = (sortingValue) => {
   if (['asc', 'desc'].includes(sortingValue)) {
@@ -29,9 +32,9 @@ const validateSortingQuery = (sortingValue) => {
 };
 
 const ProductsList = () => {
-  const itemsList = useSelector(getItemsList);
-  const itemsById = useSelector(getItemsById);
-  const isUserAuthenticated = useSelector(getIsUserAuthenticated);
+  // const isUserAuthenticated = useSelector(getIsUserAuthenticated);
+  const sortedProducts = useSelector(selectSortedProducts);
+  const productsStatus = useSelector(selectProductsStatus);
 
   const dispatch = useDispatch();
 
@@ -40,14 +43,13 @@ const ProductsList = () => {
     validateSortingQuery(searchParams.get('sort')),
   );
 
-  const [{ data: productItems, isLoading, isError }, fetch] =
-    useApi(getProducts);
-
   useEffect(() => {
-    fetch({
-      sortDirection: sortDirection,
-    });
-  }, [fetch, sortDirection]);
+    dispatch(
+      getProducts({
+        sortDirection: sortDirection,
+      }),
+    );
+  }, [dispatch, sortDirection]);
 
   const handleAddProductToBasket = (productInfo) => (event) => {
     event.preventDefault();
@@ -67,62 +69,61 @@ const ProductsList = () => {
     setSearchParams({ sort: sortDirection });
   }, [setSearchParams, sortDirection]);
 
+  const isError = productsStatus === 'error';
+  const isLoading =
+    (productsStatus === 'fetching' && !sortedProducts.length) ||
+    productsStatus === 'idle';
+
   return (
-    isUserAuthenticated && (
-      <Layout>
-        <Panel shaded>
-          <NavBarContent>
-            <Cart
-              cartItemsList={itemsList}
-              cartItemsById={itemsById}
-              onRemoveProductFromCart={handleRemoveProductFromBasket}
-            />
-          </NavBarContent>
-        </Panel>
+    <Layout>
+      <Panel shaded>
+        <NavBarContent>
+          <Cart onRemoveProductFromCart={handleRemoveProductFromBasket} />
+        </NavBarContent>
+      </Panel>
 
-        <Panel shaded>
-          <NavBarContent as="div">
-            <h4>Filters:</h4>
+      <Panel shaded>
+        <NavBarContent as="div">
+          <h4>Filters:</h4>
 
-            <StyledButton onClick={handleSortChange}>
-              Sorting:
-              {sortDirection === 'asc' ? <FaArrowDown /> : <FaArrowUp />}
-            </StyledButton>
-          </NavBarContent>
-        </Panel>
+          <StyledButton onClick={handleSortChange}>
+            Sorting:
+            {sortDirection === 'asc' ? <FaArrowDown /> : <FaArrowUp />}
+          </StyledButton>
+        </NavBarContent>
+      </Panel>
 
-        {isError && <Message type="error">Error</Message>}
+      {isError && <Message type="error">Error</Message>}
 
-        {isLoading ? (
-          <Loader backdrop content="loading..." vertical />
-        ) : (
-          <StyledProductsList>
-            {productItems.length > 0
-              ? productItems.map((product) => {
-                  const { id, title, price, image, description } = product;
+      {isLoading ? (
+        <Loader backdrop content="loading..." vertical />
+      ) : (
+        <StyledProductsList>
+          {sortedProducts.length > 0
+            ? sortedProducts.map((product) => {
+                const { id, title, price, image, description } = product;
 
-                  return (
-                    <ProductCard
-                      key={id}
-                      productId={id}
-                      title={title}
-                      price={price}
-                      description={description}
-                      image={image}
-                      onProductClick={handleAddProductToBasket({
-                        title,
-                        id,
-                        price,
-                      })}
-                    />
-                  );
-                })
-              : !isError && <h2>No products</h2>}
-          </StyledProductsList>
-        )}
-      </Layout>
-    )
+                return (
+                  <ProductCard
+                    key={id}
+                    productId={id}
+                    title={title}
+                    price={price}
+                    description={description}
+                    image={image}
+                    onProductClick={handleAddProductToBasket({
+                      title,
+                      id,
+                      price,
+                    })}
+                  />
+                );
+              })
+            : !isError && <h2>No products</h2>}
+        </StyledProductsList>
+      )}
+    </Layout>
   );
-};;;;;
+};
 
 export default ProductsList;

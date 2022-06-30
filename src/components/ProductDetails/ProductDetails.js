@@ -14,58 +14,62 @@ import {
 } from './ProductDetails.styles';
 import { addProductsToCart } from '../../store/Cart/actions';
 import { getProductById } from '../../store/Products/actions';
-import { getProduct } from '../../store/Products/selectors';
+import {
+  selectProductById,
+  selectProductStatusByProductId,
+} from '../../store/Products/selectors';
 
 const ProductDetails = () => {
   const dispatch = useDispatch();
   const params = useParams();
   const productId = params.productId;
-  const product = useSelector((state) => getProduct(state, productId));
+  const product = useSelector((state) => selectProductById(state, productId));
+  const productStatus = useSelector((state) =>
+    selectProductStatusByProductId(state, productId),
+  );
 
   useEffect(() => {
-    if (!product) {
-      dispatch(getProductById({ productId }));
-    }
-  }, [dispatch, product, productId]);
+    dispatch(getProductById({ productId }));
+  }, [dispatch, productId]);
 
-  const handleAddProductToBasket = () => {
-    dispatch(
-      addProductsToCart({ productInfo: { title, id: productId, price } }),
+  if (product) {
+    const { image, title, description, price } = product;
+
+    const handleAddProductToBasket = () => {
+      dispatch(
+        addProductsToCart({ productInfo: { title, id: productId, price } }),
+      );
+    };
+
+    return (
+      <ProductPanel>
+        <ProductWrapper>
+          <ProductImage src={image} alt={title} />
+          <Outlet />
+          <ProductInfo>
+            <h3>{title}</h3>
+            <Text>{description}</Text>
+            <Price>{price} $</Price>
+            <StyledButton
+              color="green"
+              appearance="primary"
+              type="button"
+              onClick={handleAddProductToBasket}
+            >
+              <FaCartPlus />
+              Add to cart
+            </StyledButton>
+          </ProductInfo>
+        </ProductWrapper>
+      </ProductPanel>
     );
-  };
-
-  if (product?.status === 'fetching' || !product?.status) {
-    return <Loader backdrop content="loading..." vertical />;
   }
 
-  if (product?.status === 'error') {
+  if (productStatus === 'error') {
     return <Message type="error">Error</Message>;
   }
 
-  const { image, title, description, price } = product.entity;
-
-  return (
-    <ProductPanel>
-      <ProductWrapper>
-        <ProductImage src={image} alt={title} />
-        <Outlet />
-        <ProductInfo>
-          <h3>{title}</h3>
-          <Text>{description}</Text>
-          <Price>{price} $</Price>
-          <StyledButton
-            color="green"
-            appearance="primary"
-            type="button"
-            onClick={handleAddProductToBasket}
-          >
-            <FaCartPlus />
-            Add to cart
-          </StyledButton>
-        </ProductInfo>
-      </ProductWrapper>
-    </ProductPanel>
-  );
+  return <Loader backdrop content="loading..." vertical />;
 };
 
 export default ProductDetails;
