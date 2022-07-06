@@ -1,4 +1,12 @@
-import { createAction } from '@reduxjs/toolkit';
+import { createAsyncThunk } from '@reduxjs/toolkit';
+import { createUserRequest, authenticateUserRequest } from '../../api/requests';
 
-export const authenticateUser = createAction('auth/AUTHENTICATE_USER');
-export const deauthenticateUser = createAction('auth/DEAUTHENTICATE_USER');
+export const createUser = createAsyncThunk(
+  'auth/CREATE_USER',
+  createUserRequest,
+);
+
+export const loginUser = createAsyncThunk(
+  'auth/LOGIN_USER',
+  authenticateUserRequest,
+);

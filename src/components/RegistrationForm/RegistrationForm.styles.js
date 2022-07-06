@@ -39,8 +39,6 @@ export const StyledInput = styled.input`
   }
 `;
 
-export const Checkbox = styled.div``;
-
 export const SubmitButton = styled(Button)`
   margin-top: 20px;
 `;

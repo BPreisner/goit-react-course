@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { nanoid } from 'nanoid';
 import {
@@ -8,30 +8,33 @@ import {
   SubmitButton,
   LoginFormContainer,
 } from './LoginForm.styles';
-import { useApi } from '../../hooks/useApi';
-import { authenticateUserRequest } from '../../api/requests';
-import { authenticateUser } from '../../store/Auth/actions';
+import { loginUser } from '../../store/Auth/actions';
+import { selectUserRequestStatus } from '../../store/Auth/selectors';
 
 const LoginForm = () => {
   const dispatch = useDispatch();
-  const [{ data, isLoading }, login] = useApi(authenticateUserRequest);
   const navigate = useNavigate();
+  const userRequestStatus = useSelector(selectUserRequestStatus);
 
   const usernameId = useRef(nanoid());
   const passwordId = useRef(nanoid());
 
   const [formValues, setFormValues] = useState({
     password: '',
-    username: '',
+    email: '',
   });
 
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    login({
-      password: 'William56$hj',
-      username: 'hopkins',
-    });
+    const { email, password } = formValues;
+
+    dispatch(
+      loginUser({
+        email,
+        password,
+      }),
+    );
   };
 
   const handleInputValueChange = (event) => {
@@ -42,23 +45,21 @@ const LoginForm = () => {
   };
 
   useEffect(() => {
-    if (data.token) {
-      dispatch(authenticateUser());
-
-      navigate('/products');
+    if (userRequestStatus === 'success') {
+      navigate('/');
     }
-  }, [data, dispatch, navigate]);
+  }, [userRequestStatus, navigate]);
 
   return (
     <LoginFormContainer>
       <StyledForm onSubmit={handleSubmit}>
-        <label htmlFor={usernameId.current}>Username:</label>
+        <label htmlFor={usernameId.current}>Email:</label>
         <StyledInput
           autoFocus
           id={usernameId.current}
-          name="username"
-          placeholder="Username"
-          value={formValues.username}
+          name="email"
+          placeholder="Email"
+          value={formValues.email}
           onChange={handleInputValueChange}
         />
 
@@ -75,13 +76,17 @@ const LoginForm = () => {
         <SubmitButton
           appearance="primary"
           type="submit"
-          disabled={isLoading || !formValues.password || !formValues.username}
+          disabled={
+            userRequestStatus === 'fetching' ||
+            !formValues.password ||
+            !formValues.email
+          }
         >
           Submit
         </SubmitButton>
       </StyledForm>
     </LoginFormContainer>
   );
-};
+};;;;
 
 export default LoginForm;

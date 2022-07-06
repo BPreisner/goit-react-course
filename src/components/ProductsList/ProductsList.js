@@ -1,6 +1,6 @@
 import { FaArrowDown, FaArrowUp } from 'react-icons/fa';
 import { Loader, Message, Panel } from 'rsuite';
-import { useSelector, useDispatch, shallowEqual } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import ProductCard from '../ProductCard/ProductCard';
