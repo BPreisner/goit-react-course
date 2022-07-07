@@ -1,8 +1,4 @@
-import {
-  storeApiClient,
-  authenticationApiClient,
-  goItApiClient,
-} from './client';
+import { storeApiClient, goItApiClient } from './client';
 import { JWT_TOKEN_STORAGE_KEY } from './constants';
 
 export const getProductsRequest = async ({ sortDirection } = {}) => {
@@ -11,10 +7,6 @@ export const getProductsRequest = async ({ sortDirection } = {}) => {
       sort: sortDirection,
     },
   });
-
-  const { data: data2 } = await goItApiClient.get('/users/current');
-
-  console.log(data2);
 
   return data;
 };
@@ -26,7 +18,7 @@ export const getProductByIdRequest = async ({ productId }) => {
 };
 
 export const createUserRequest = async (payload) => {
-  const { data } = await authenticationApiClient.post('/users/signup', payload);
+  const { data } = await goItApiClient.post('/users/signup', payload);
 
   localStorage.setItem(JWT_TOKEN_STORAGE_KEY, data.token);
 
@@ -34,9 +26,25 @@ export const createUserRequest = async (payload) => {
 };
 
 export const authenticateUserRequest = async (payload) => {
-  const { data } = await authenticationApiClient.post('/users/login', payload);
+  const { data } = await goItApiClient.post('/users/login', payload);
 
   localStorage.setItem(JWT_TOKEN_STORAGE_KEY, data.token);
 
   return data;
+};
+
+export const checkIfStillAuthenticatedRequest = async () => {
+  const { data } = await goItApiClient.get('/users/current');
+
+  return data;
+};
+
+export const logoutUserRequest = async (arg, thunkAPI) => {
+  try {
+    await goItApiClient.post('/users/logout');
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error);
+  } finally {
+    localStorage.removeItem(JWT_TOKEN_STORAGE_KEY);
+  }
 };

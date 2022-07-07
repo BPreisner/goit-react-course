@@ -1,5 +1,10 @@
 import { initialState } from './constants';
-import { createUser, loginUser } from './actions';
+import {
+  createUser,
+  loginUser,
+  logoutUser,
+  checkIfStillAuthenticated,
+} from './actions';
 import { createReducer } from '@reduxjs/toolkit';
 
 const authReducer = createReducer(initialState, (builder) => {
@@ -34,6 +39,32 @@ const authReducer = createReducer(initialState, (builder) => {
       };
 
       state.isUserAuthenticated = true;
+    })
+
+    .addCase(logoutUser.fulfilled, (state) => {
+      state.user = {};
+      state.isUserAuthenticated = false;
+    })
+    .addCase(logoutUser.rejected, (state) => {
+      state.user = {};
+      state.isUserAuthenticated = false;
+    })
+
+    .addCase(checkIfStillAuthenticated.pending, (state) => {
+      state.user.status = 'fetching';
+    })
+    .addCase(checkIfStillAuthenticated.fulfilled, (state, action) => {
+      state.user = {
+        status: 'success',
+        email: action.payload.email,
+        name: action.payload.name,
+      };
+
+      state.isUserAuthenticated = true;
+    })
+    .addCase(checkIfStillAuthenticated.rejected, (state) => {
+      state.user = {};
+      state.isUserAuthenticated = false;
     });
 });
 

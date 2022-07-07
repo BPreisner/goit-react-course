@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { nanoid } from 'nanoid';
-import { useNavigate } from 'react-router-dom';
 import {
   StyledForm,
   StyledInput,
@@ -34,8 +33,6 @@ const formValidate = (values) => {
 const RegistrationForm = () => {
   const dispatch = useDispatch();
   const userRequestStatus = useSelector(selectUserRequestStatus);
-
-  const navigate = useNavigate();
 
   const inputRef = useRef(); // { current: }
   const firstNameId = useRef(nanoid());
@@ -74,12 +71,6 @@ const RegistrationForm = () => {
   useEffect(() => {
     inputRef.current.focus();
   }, []);
-
-  useEffect(() => {
-    if (userRequestStatus === 'success') {
-      navigate('/');
-    }
-  }, [userRequestStatus, navigate]);
 
   const isSubmitButtonEnabled = formValidate(formValues);
 

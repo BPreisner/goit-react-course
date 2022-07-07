@@ -1,6 +1,6 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import { nanoid } from 'nanoid';
 import {
   StyledForm,
@@ -13,7 +13,6 @@ import { selectUserRequestStatus } from '../../store/Auth/selectors';
 
 const LoginForm = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const userRequestStatus = useSelector(selectUserRequestStatus);
 
   const usernameId = useRef(nanoid());
@@ -44,12 +43,6 @@ const LoginForm = () => {
     }));
   };
 
-  useEffect(() => {
-    if (userRequestStatus === 'success') {
-      navigate('/');
-    }
-  }, [userRequestStatus, navigate]);
-
   return (
     <LoginFormContainer>
       <StyledForm onSubmit={handleSubmit}>
@@ -73,6 +66,8 @@ const LoginForm = () => {
           onChange={handleInputValueChange}
         />
 
+        <Link to="/registration">Didn't have account? Register instead</Link>
+
         <SubmitButton
           appearance="primary"
           type="submit"
@@ -87,6 +82,6 @@ const LoginForm = () => {
       </StyledForm>
     </LoginFormContainer>
   );
-};;;;
+};
 
 export default LoginForm;

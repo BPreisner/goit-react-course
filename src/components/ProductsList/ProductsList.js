@@ -16,7 +16,6 @@ import {
   removeProductFromCart,
 } from '../../store/Cart/actions';
 
-// import { getIsUserAuthenticated } from '../../store/Auth/selectors';
 import { getProducts } from '../../store/Products/actions';
 import {
   selectSortedProducts,
@@ -32,7 +31,6 @@ const validateSortingQuery = (sortingValue) => {
 };
 
 const ProductsList = () => {
-  // const isUserAuthenticated = useSelector(getIsUserAuthenticated);
   const sortedProducts = useSelector(selectSortedProducts);
   const productsStatus = useSelector(selectProductsStatus);
 
